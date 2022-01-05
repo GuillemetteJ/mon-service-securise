@@ -1,0 +1,16 @@
+mixin elementsAjoutables({ nom, valeurExemple = '', donnees = [], textBoutonAjouter = 'Ajouter' })
+  div(id = nom)
+    each value, index in donnees
+      label.item-ajoute
+        .icone-suppression
+        input(
+          id = 'description-' + nom + '-' + index,
+          name = 'description-' + nom + '-' + index,
+          type = 'text',
+          value = value.description,
+          placeholder = valeurExemple
+        )
+  a(
+    class = 'nouvel-item',
+    id = 'nouveaux-' + nom
+  )= textBoutonAjouter

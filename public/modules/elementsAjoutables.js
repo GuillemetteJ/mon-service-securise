@@ -1,47 +1,28 @@
-import { brancheAjoutItem, peupleListeItems } from './saisieListeItems.js';
+import { brancheAjoutItem } from './saisieListeItems.js';
 
-export default class ElementsAjoutables {
-  constructor({ nom, valeurExemple = '' }, selecteurConteneur, selecteurDonnees, selecteurLienAjout) {
-    this.zoneSaisie = { nom, valeurExemple };
-    this.selecteurConteneur = selecteurConteneur;
-    this.selecteurDonnees = selecteurDonnees;
-    this.selecteurLienAjout = selecteurLienAjout;
-    this.indexMax = 0;
+const brancheElementsAjoutables = (nom, valeurExemple = '') => {
+  const calculeIndexMax = (selecteurDuConteneur) => $(selecteurDuConteneur).children().length - 1;
 
-    this.peuple();
-    this.branche();
-  }
+  const selecteurConteneur = `#${nom}`;
+  const selecteurLienAjout = `#nouveaux-${nom}`;
+  let indexMax = calculeIndexMax(selecteurConteneur);
 
-  static nouveaux({ nom, valeurExemple = '' }, selecteurConteneur, selecteurDonnees, selecteurLienAjout) {
-    return new ElementsAjoutables(
-      { nom, valeurExemple }, selecteurConteneur, selecteurDonnees, selecteurLienAjout
-    );
-  }
+  const templateZoneSaisie = (nomElement, valeurExempleElement) => (index, { description = '' }) => `
+    <input
+      id="description-${nomElement}-${index}"
+      name="description-${nomElement}-${index}"
+      type="text"
+      value="${description}"
+      placeholder="${valeurExempleElement}"
+    >
+  `;
 
-  peuple() {
-    this.indexMax = peupleListeItems(
-      this.selecteurConteneur, this.selecteurDonnees, this.templateZoneSaisie()
-    );
-  }
+  brancheAjoutItem(
+    selecteurLienAjout,
+    selecteurConteneur,
+    (index) => templateZoneSaisie(nom, valeurExemple)(index, {}),
+    () => (indexMax += 1)
+  );
+};
 
-  branche() {
-    brancheAjoutItem(
-      this.selecteurLienAjout,
-      this.selecteurConteneur,
-      (index) => this.templateZoneSaisie()(index, {}),
-      () => (this.indexMax += 1)
-    );
-  }
-
-  templateZoneSaisie() {
-    return (index, { description = '' }) => `
-      <input
-        id="description-${this.zoneSaisie.nom}-${index}"
-        name="description-${this.zoneSaisie.nom}-${index}"
-        type="text"
-        value="${description}"
-        placeholder="${this.zoneSaisie.valeurExemple}"
-      >
-    `;
-  }
-}
+export default brancheElementsAjoutables;
