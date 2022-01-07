@@ -100,7 +100,7 @@ describe('Le serveur MSS', () => {
   const verifieAseptisationListe = (nom, proprietesParametre) => {
     expect(listesAseptisees.some((liste) => liste?.nom === nom)).to.be(true);
     const listeRecherche = listesAseptisees.find((liste) => liste.nom === nom);
-    expect(listeRecherche?.proprietesParametre).to.eql(proprietesParametre);
+    expect(listeRecherche?.proprietes).to.eql(proprietesParametre);
   };
 
   const verifieJetonDepose = (reponse, suite) => {
@@ -130,8 +130,8 @@ describe('Le serveur MSS', () => {
       suite();
     },
 
-    aseptiseListe: (nom, proprietesParametre) => (requete, reponse, suite) => {
-      listesAseptisees.push({ nom, proprietesParametre });
+    aseptiseListes: (listes) => (requete, reponse, suite) => {
+      listes.forEach(({ nom, proprietes }) => listesAseptisees.push({ nom, proprietes }));
       suite();
     },
 

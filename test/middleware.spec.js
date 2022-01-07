@@ -350,13 +350,52 @@ describe('Le middleware MSS', () => {
   });
 
   describe("sur une demande d'aseptisation d'une liste", () => {
-    it('supprime les éléments dont les propriétés sont vides', (done) => {
+    it('supprime les éléments dont les toutes propriétés sont vides', (done) => {
       const middleware = Middleware();
       requete.body.listeAvecProprieteVide = [
         { description: 'une description' }, { description: null },
       ];
       middleware.aseptiseListe('listeAvecProprieteVide', ['description'])(requete, reponse, () => {
         expect(requete.body.listeAvecProprieteVide).to.have.length(1);
+        done();
+      });
+    });
+
+    it('ne supprime pas les éléments dont une partie des propriétés sont vides', (done) => {
+      const middleware = Middleware();
+      requete.body.listeAvecProprietesPartiellementVides = [
+        { description: 'une description', nom: null },
+      ];
+      middleware.aseptiseListe('listeAvecProprietesPartiellementVides', ['description', 'nom'])(requete, reponse, () => {
+        expect(requete.body.listeAvecProprietesPartiellementVides).to.have.length(1);
+        done();
+      });
+    });
+
+    it('ne supprime pas les éléments dont les propriétés sont des tableaux vides', (done) => {
+      const middleware = Middleware();
+      requete.body.listeAvecProprieteTableauVide = [
+        { description: [] },
+      ];
+      middleware.aseptiseListe('listeAvecProprieteTableauVide', ['description'])(requete, reponse, () => {
+        expect(requete.body.listeAvecProprieteTableauVide).to.have.length(1);
+        done();
+      });
+    });
+  });
+
+  describe("sur une demande d'aseptisation de plusieurs listes", () => {
+    it('supprime dans chaque liste les éléments dont toutes les propriétés sont vides', (done) => {
+      const middleware = Middleware();
+      requete.body.listeUn = [
+        { description: 'une description' }, { description: null },
+      ];
+      requete.body.listeDeux = [
+        { description: 'une description' }, { description: null },
+      ];
+      middleware.aseptiseListes([{ nom: 'listeUn', proprietes: ['description'] }, { nom: 'listeDeux', proprietes: ['description'] }])(requete, reponse, () => {
+        expect(requete.body.listeUn).to.have.length(1);
+        expect(requete.body.listeDeux).to.have.length(1);
         done();
       });
     });

@@ -98,20 +98,28 @@ const middleware = (configuration = {}) => {
       .catch(suite);
   });
 
-  const aseptiseListe = (nomListe, proprietesParametre) => (
+  const aseptiseListes = (listes) => (
     (requete, reponse, suite) => {
-      requete.body[nomListe] &&= requete.body[nomListe].filter(
-        (element) => proprietesParametre.some((propriete) => element && element[propriete])
-      );
+      listes.forEach(({ nom, proprietes }) => {
+        requete.body[nom] &&= requete.body[nom].filter(
+          (element) => proprietes.some((propriete) => element && element[propriete])
+        );
+      });
       suite();
-    });
+    }
+  );
+
+  const aseptiseListe = (nomListe, proprietesParametre) => (
+    aseptiseListes([{ nom: nomListe, proprietes: proprietesParametre }])
+  );
 
   return {
     aseptise,
+    aseptiseListe,
+    aseptiseListes,
     authentificationBasique,
     positionneHeaders,
     positionneHeadersAvecNonce,
-    aseptiseListe,
     repousseExpirationCookie,
     suppressionCookie,
     trouveHomologation,
